@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (do not commit)
+data/raw/
+data/staged/
+*.zip
+
+# OS junk
+.DS_Store
+!data/raw/.gitkeep
+!data/staged/.gitkeep
