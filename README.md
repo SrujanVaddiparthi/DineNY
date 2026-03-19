@@ -149,3 +149,37 @@ http://127.0.0.1:8000/api/restaurants/<id>
 
 - Jinja templates are for demo/testing only  
 - Frontend should use API routes  
+
+---
+
+## Recent Updates
+
+The backend now additionally supports:
+
+### Search Enhancements
+- text search (name, cuisine, address)
+- geospatial search (latitude, longitude, radius)
+- optional rating filters:
+  - `min_rating`
+  - `max_rating`
+
+### Maps Integration
+- results page displays restaurants on a map
+- detail page shows a single-location map with a marker
+
+### Image Handling (GridFS)
+- primary images stored in MongoDB GridFS
+- served via:
+  - `/api/images/{file_id}`
+- detail endpoint includes:
+  - `primary_image_src`
+
+### Comments
+- users can submit comments on restaurant detail pages
+- comments persist in MongoDB
+
+### Frontend Integration Ready
+- API contract defined in:
+  - `docs/frontend_api_contract.md`
+- frontend flow documented in:
+  - `docs/frontend_flow_notes.md`
