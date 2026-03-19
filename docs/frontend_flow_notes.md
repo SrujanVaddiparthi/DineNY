@@ -125,4 +125,4 @@ Show:
 
 - `primary_image_src` is now available for GridFS-backed image display
 - detail endpoint already includes map-related fields
-- search endpoint already includes coordinates for results map rendering
+- search endpoint already includes coordinates for results map rendering.
