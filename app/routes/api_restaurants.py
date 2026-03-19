@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from fastapi import APIRouter, HTTPException
 
 from app.services.restaurant_service import get_restaurant_by_id

@@ -2,6 +2,21 @@
 <html>
 <head>
     <title>{{ restaurant.title }}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        #detail-map {
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            margin-top: 16px;
+        }
+    </style>
 </head>
 <body>
     <h1>{{ restaurant.title }}</h1>
@@ -27,8 +42,17 @@
         </ul>
     {% endif %}
 
+    <h2>Primary Image</h2>
+    {% if restaurant.primary_image_src %}
+        <div style="margin-bottom: 12px;">
+            <img src="{{ restaurant.primary_image_src }}" alt="{{ restaurant.title }}" width="300">
+        </div>
+    {% else %}
+        <p>No primary image available.</p>
+    {% endif %}
+
     {% if restaurant.image_urls %}
-        <h2>Images</h2>
+        <h2>Other Images</h2>
         {% for image in restaurant.image_urls[:3] %}
             {% if image.thumbnail %}
                 <div style="margin-bottom: 12px;">
@@ -37,8 +61,15 @@
                 </div>
             {% endif %}
         {% endfor %}
-    {% else %}
-        <p>No images available.</p>
+    {% endif %}
+
+    {% if restaurant.latitude is not none and restaurant.longitude is not none %}
+        <h2>Location</h2>
+        <p>
+            <strong>Latitude:</strong> {{ restaurant.latitude }}<br>
+            <strong>Longitude:</strong> {{ restaurant.longitude }}
+        </p>
+        <div id="detail-map"></div>
     {% endif %}
 
     <h2>Comments</h2>
@@ -74,5 +105,24 @@
     </form>
 
     <p><a href="/">Back to search</a></p>
+
+    {% if restaurant.latitude is not none and restaurant.longitude is not none %}
+    <script>
+        const detailMap = L.map('detail-map').setView(
+            [{{ restaurant.latitude }}, {{ restaurant.longitude }}],
+            15
+        );
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(detailMap);
+
+        const marker = L.marker([{{ restaurant.latitude }}, {{ restaurant.longitude }}]).addTo(detailMap);
+
+        marker.bindPopup(
+            `<strong>{{ restaurant.title | e }}</strong><br>{{ restaurant.category | e }}`
+        ).openPopup();
+    </script>
+    {% endif %}
 </body>
 </html>

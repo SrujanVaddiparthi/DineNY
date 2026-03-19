@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -9,6 +5,18 @@ from datetime import datetime, timezone
 
 from bson import ObjectId
 from app.db import get_collection
+
+
+def build_primary_image_src(doc: dict[str, Any]) -> str | None:
+    primary_image_gridfs_id = doc.get("primary_image_gridfs_id")
+    if primary_image_gridfs_id:
+        return f"/api/images/{primary_image_gridfs_id}"
+
+    image_urls = doc.get("image_urls", [])
+    if image_urls and image_urls[0].get("thumbnail"):
+        return image_urls[0]["thumbnail"]
+
+    return None
 
 
 def get_restaurant_by_id(restaurant_id: str) -> Optional[dict[str, Any]]:
@@ -28,7 +36,8 @@ def get_restaurant_by_id(restaurant_id: str) -> Optional[dict[str, Any]]:
         "address": doc.get("address"),
         "categories": doc.get("categories", []),
         "image_urls": doc.get("image_urls", []),
-        "primary_image_gridfs_id": doc.get("primary_image_gridfs_id"),
+        "primary_image_gridfs_id": str(doc["primary_image_gridfs_id"]) if doc.get("primary_image_gridfs_id") else None,
+        "primary_image_src": build_primary_image_src(doc),
         "latitude": doc.get("latitude"),
         "longitude": doc.get("longitude"),
         "location": doc.get("location"),
