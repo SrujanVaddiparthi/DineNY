@@ -1,0 +1,15 @@
+"""
+
+"""
+
+import os
+from pymongo import MongoClient
+
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+DB_NAME = "dineny"
+
+client = MongoClient(MONGO_URI)
+db = client[DB_NAME]
+
+def get_collection(name: str):
+    return db[name]

@@ -1,0 +1,40 @@
+DineNY/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── config.py
+│   ├── db.py
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── pages.py
+│   │   ├── api_search.py
+│   │   ├── api_restaurants.py
+│   │   └── api_images.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── search_service.py
+│   │   ├── restaurant_service.py
+│   │   └── image_service.py
+│   ├── templates/
+│   │   ├── base.html
+│   │   ├── index.html
+│   │   ├── results.html
+│   │   └── details.html
+│   └── static/
+│       ├── css/
+│       │   └── styles.css
+│       └── js/
+│           └── app.js
+├── scripts/
+│   ├── build_clean_collection.py
+│   ├── load_gridfs_images.py
+│   ├── create_indexes.py
+│   └── create_mongo_user.py
+├── data/
+│   ├── raw/
+│   └── scaled/
+├── notebooks/
+│   └── filter_nyc_etl.ipynb
+├── requirements.txt
+├── README.md
+└── .gitignore

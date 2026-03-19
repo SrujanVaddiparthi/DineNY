@@ -1,0 +1,46 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DineNY Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+
+    <form action="/search" method="get">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search restaurants..." />
+        <button type="submit">Search</button>
+    </form>
+
+    <p>
+        {% if query %}
+            Results for: <strong>{{ query }}</strong>
+        {% else %}
+            No search query entered.
+        {% endif %}
+    </p>
+
+    {% if results %}
+        <ul>
+            {% for restaurant in results %}
+                <li>
+                    <a href="/restaurants/{{ restaurant.id }}">
+                        <strong>{{ restaurant.title }}</strong>
+                    </a><br>
+                    Category: {{ restaurant.category }}<br>
+                    Rating: {{ restaurant.rating }}<br>
+                    Address: {{ restaurant.address }}<br>
+                </li>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% if query %}
+            <p>No matching restaurants found.</p>
+        {% endif %}
+    {% endif %}
+
+    <p><a href="/">Back to search</a></p>
+</body>
+</html>
