@@ -2,8 +2,14 @@ import { useState } from 'react';
 
 export default function SearchPage({ onSearch, onGeoSearch }) {
   const [query, setQuery] = useState('');
+  const [minRating, setMinRating] = useState('');
+  const [maxRating, setMaxRating] = useState('');
 
-  const submit = (e) => { e.preventDefault(); query.trim() && onSearch(query.trim()); };
+  const submit = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    onSearch(query.trim(), minRating || null, maxRating || null);
+  };
 
   return (
     <main className="search-page">
@@ -31,6 +37,34 @@ export default function SearchPage({ onSearch, onGeoSearch }) {
             <button className="search-button" type="submit">Search</button>
           </div>
         </form>
+        <div className="filter-row">
+          <div className="filter-field">
+            <label>Min rating</label>
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              className="field"
+              value={minRating}
+              onChange={e => setMinRating(e.target.value)}
+              placeholder="e.g. 3.5"
+            />
+          </div>
+          <div className="filter-field">
+            <label>Max rating</label>
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              className="field"
+              value={maxRating}
+              onChange={e => setMaxRating(e.target.value)}
+              placeholder="e.g. 5"
+            />
+          </div>
+        </div>
       </div>
     </main>
   );

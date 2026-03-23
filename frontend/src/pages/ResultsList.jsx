@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { searchRestaurants, searchGeo } from '../api/api';
 import Stars from '../components/shared/Stars';
 import RestaurantModal from './RestaurantModal';
+import ResultsMap from '../components/shared/ResultsMap';
 
 function SkeletonRows() {
   return Array.from({ length: 5 }).map((_, i) => (
@@ -13,24 +14,58 @@ function SkeletonRows() {
   ));
 }
 
-export default function ResultsList({ query, lat, lng, radius, onBack, onNewSearch }) {
+export default function ResultsList({ query, lat, lng, radius, minRating, maxRating, onBack, onNewSearch }) {
   const [results,    setResults]    = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [searchInput, setSearchInput] = useState(query || '');
+  const [sortKey, setSortKey] = useState('name');
+  const [sortDir, setSortDir] = useState('asc');
 
   useEffect(() => {
     setLoading(true);
     const fetch = (lat != null && lng != null)
-      ? searchGeo(query, lat, lng, radius || 10)
-      : searchRestaurants(query);
-    fetch.then(data => { setResults(data); setLoading(false); });
-  }, [query, lat, lng, radius]);
+      ? searchGeo(query, lat, lng, radius || 10, minRating, maxRating)
+      : searchRestaurants(query, minRating, maxRating);
+    fetch.then(data => {
+      console.info('[Results] fetched', data.length, data.slice(0, 3));
+      setResults(data);
+      setLoading(false);
+    });
+  }, [query, lat, lng, radius, minRating, maxRating]);
 
   const handleInlineSearch = (e) => {
     e.preventDefault();
-    searchInput.trim() && onNewSearch(searchInput.trim());
+    if (!searchInput.trim()) return;
+    onNewSearch(searchInput.trim(), minRating || null, maxRating || null);
   };
+
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
+  const sorted = [...results].sort((a, b) => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    const getVal = (obj) => {
+      switch (sortKey) {
+        case 'name': return obj.name || '';
+        case 'city': return obj.city || '';
+        case 'cuisine': return obj.cuisine || '';
+        case 'rating': return obj.rating ?? 0;
+        default: return '';
+      }
+    };
+    const va = getVal(a);
+    const vb = getVal(b);
+    if (va < vb) return -1 * dir;
+    if (va > vb) return 1 * dir;
+    return 0;
+  });
 
   return (
     <main className="results-page">
@@ -53,7 +88,7 @@ export default function ResultsList({ query, lat, lng, radius, onBack, onNewSear
       </div>
 
       <div className="results-search-bar">
-        <form onSubmit={handleInlineSearch}>
+        <form onSubmit={handleInlineSearch} className="filter-form">
           <div className="results-input-group">
             <span className="results-search-icon">
               <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
@@ -66,41 +101,56 @@ export default function ResultsList({ query, lat, lng, radius, onBack, onNewSear
         </form>
       </div>
 
-      <div className="grid-wrap">
-        {!loading && results.length === 0 ? (
-          <div className="empty">
-            <div className="empty-icon">🍽️</div>
-            <h3>No restaurants found for "{query}"</h3>
-            <p>Try a broader term — e.g. "pizza" instead of "deep dish pizza"</p>
-          </div>
-        ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                {['Restaurant', 'Address', 'City', 'Cuisine', 'Rating', 'Actions'].map(h => (
-                  <th key={h}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading
-                ? <SkeletonRows />
-                : results.map(r => (
-                  <tr key={r._id} onClick={() => setSelectedId(r._id)}>
-                    <td className="td-name">{r.name}</td>
-                    <td className="td-muted">{r.address}</td>
-                    <td className="td-muted">{r.city}</td>
-                    <td><span className="tag">{r.cuisine.split(',')[0].trim()}</span></td>
-                    <td><Stars rating={r.rating} /></td>
-                    <td onClick={e => e.stopPropagation()}>
-                      <button className="view-btn" onClick={() => setSelectedId(r._id)}>View →</button>
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-        )}
+      <div className="results-layout">
+        <div className="grid-wrap">
+          {!loading && sorted.length === 0 ? (
+            <div className="empty">
+              <div className="empty-icon">🍽️</div>
+              <h3>No restaurants found for "{query}"</h3>
+              <p>Try a broader term — e.g. "pizza" instead of "deep dish pizza"</p>
+            </div>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  {[
+                    { key: 'name', label: 'Restaurant' },
+                    { key: 'address', label: 'Address', sortable: false },
+                    { key: 'city', label: 'City' },
+                    { key: 'cuisine', label: 'Cuisine' },
+                    { key: 'rating', label: 'Rating' },
+                    { key: 'actions', label: 'Actions', sortable: false },
+                  ].map(({ key, label, sortable = true }) => (
+                    <th key={key} onClick={sortable ? () => toggleSort(key) : undefined} style={sortable ? { cursor: 'pointer' } : undefined}>
+                      {label}{sortable && sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {loading
+                  ? <SkeletonRows />
+                  : sorted.map(r => (
+                    <tr key={r._id} onClick={() => setSelectedId(r._id)}>
+                      <td className="td-name">{r.name}</td>
+                      <td className="td-muted">{r.address}</td>
+                      <td className="td-muted">{r.city || '—'}</td>
+                      <td><span className="tag">{(r.cuisine || '').split(',')[0].trim() || 'N/A'}</span></td>
+                      <td><Stars rating={r.rating} /></td>
+                      <td onClick={e => e.stopPropagation()}>
+                        <button className="view-btn" onClick={() => setSelectedId(r._id)}>View →</button>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="map-wrap">
+          <ResultsMap results={sorted} loading={loading} />
+        </div>
       </div>
 
       {selectedId && <RestaurantModal restaurantId={selectedId} onClose={() => setSelectedId(null)} />}
