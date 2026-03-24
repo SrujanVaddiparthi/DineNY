@@ -20,12 +20,11 @@ DineNY is a MongoDB + FastAPI + React/Vite application for restaurant search in 
 - Common issues: inconsistent address formats, missing/zero coordinates, duplicate records—mitigated via basic de-dupe and null/zero guards.
 
 3) **Volume (collection sizes)**  
-Run in MongoDB shell/Compass and paste results:  
-```js
-db.restaurants.countDocuments();        // raw
-db.restaurants_clean.countDocuments();   // cleaned (primary collection)
+
+```bash
+db.restaurants_clean.countDocuments();
+7294
 ```
-If you have other collections (e.g., comments, images), include their counts too.
 
 4) **Variety (interesting searches)**  
 Sample queries that surface diverse results:  
