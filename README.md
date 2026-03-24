@@ -50,13 +50,6 @@ Sample queries that surface diverse results:
 - Rating filters: min 4.0 + cuisine (e.g., "sushi") to see high-rated spots.
 
 5) **Bells and Whistles (what we’re proud of)**  
-- Integrated map view with clustered markers via Leaflet.  
-- Geo + text search with rating filters and sorting.  
-- Detail view with images (GridFS-backed) and live comments.  
-- Clean UI (React/Vite), responsive layout, quick search bar + inline filters.  
-- API-first design: consistent JSON routes for frontend/other clients.
-
-5) **Bells and Whistles (what we’re proud of)**  
 - Combined **text search and geospatial search** using MongoDB’s 2dsphere indexing and flexible query design.  
 - Integrated **interactive map visualization** with live backend-driven results.  
 - Implemented **GridFS-based image storage** with graceful fallback to external image URLs when needed.  
