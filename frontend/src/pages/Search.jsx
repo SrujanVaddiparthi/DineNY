@@ -14,6 +14,7 @@ export default function SearchPage({ onSearch, onGeoSearch }) {
   return (
     <main className="search-page">
       <div className="hero">
+        <div className="brand-mark">DineNY</div>
         <span className="eyebrow">NY State Restaurant Search</span>
         <h1 className="title">Find your next great <em>meal</em></h1>
         <p className="subtitle">Search thousands of restaurants across New York State</p>
