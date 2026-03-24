@@ -4,6 +4,12 @@ DineNY is a MongoDB + FastAPI + React/Vite application for restaurant search in 
 
 ---
 
+## Live Site
+- App: https://dineny.webdev.gccis.rit.edu/
+- API base (via Nginx): https://dineny.webdev.gccis.rit.edu/api
+
+---
+
 ## Assignment Readme Requirements
 
 1) **Technology Stack (and why)**  
@@ -184,6 +190,19 @@ cd frontend && npm run build && cd ..
 sudo systemctl restart dineny-backend
 sudo systemctl reload nginx
 ```
+
+7) **Remote access & SSH tunneling**
+```bash
+# Shell into server (custom port)
+ssh student@dineny.webdev.gccis.rit.edu -p 22070
+
+# Forward local port 27017 to remote Mongo
+ssh -L 27017:localhost:27017 -p 22070 student@dineny.webdev.gccis.rit.edu
+
+# Forward local 8000 to hit FastAPI directly (bypass Nginx) if debugging
+ssh -L 8000:localhost:8000 -p 22070 student@dineny.webdev.gccis.rit.edu
+```
+Nginx already exposes `/api` and the frontend on 80/443, so tunnels are only needed for direct backend/Mongo access.
 
 ---
 
