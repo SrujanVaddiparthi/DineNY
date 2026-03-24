@@ -13,17 +13,24 @@ DineNY is a MongoDB + FastAPI + React/Vite application for restaurant search in 
 ## Assignment Readme Requirements
 
 1) **Technology Stack (and why)**  
-- Backend: FastAPI + Uvicorn (fast, async, easy JSON APIs), MongoDB with 2dsphere (native geo search) + GridFS (image storage).  
-- Frontend: React + Vite (fast dev/build), react-leaflet/Leaflet (battle-tested mapping), Axios (HTTP).  
-- Infra: Node 22+ / Python 3.10+, Nginx (reverse proxy), systemd (service management).
+- **Backend:** FastAPI + Uvicorn (fast API development, easy JSON endpoints), PyMongo (direct MongoDB integration), MongoDB with 2dsphere indexing (native geospatial search) and GridFS (image storage).  
+- **Frontend:** React + Vite (fast development/build workflow), Leaflet / react-leaflet (interactive maps), Axios (API requests).  
+- **Infrastructure / Deployment:** Python 3.10+, Node.js 22+, MongoDB, and VM deployment on RLES. Reverse proxy / service setup used for running the application on the VM.
 
 2) **Process (loading + cleansing)**  
-- Imported raw CSV of NY restaurants into MongoDB (`restaurants`).  
-- Cleaned into `restaurants_clean`: standardized casing, trimmed whitespace, normalized ratings, built `search_blob` for text search.  
-- Converted lat/lon into GeoJSON `location`, fixed swapped/invalid coords, dropped rows without usable coordinates.  
-- Created 2dsphere index on `location` to enable geo queries.  
-- Handled missing images by allowing empty `primary_image_src`; GridFS used for stored images.  
-- Common issues: inconsistent address formats, missing/zero coordinates, duplicate records—mitigated via basic de-dupe and null/zero guards.
+- Started with a large [raw CSV dataset](https://www.kaggle.com/datasets/kwxdata/380k-restaurants-mostly-usa-based) of restaurant records and filtered it down to New York State / nearby metro area restaurants using an ETL notebook.  
+- Removed irrelevant records and handled noisy data, including inconsistent casing, extra whitespace, missing values, and invalid fields.  
+- Imported the filtered CSV into MongoDB as the raw `restaurants` collection using `mongoimport`.  
+- Built a cleaned backend-ready collection called `restaurants_clean` using a Python transformation script.  
+- Standardized fields such as title, category, address, and rating, and created a combined `search_blob` field to support partial text search across restaurant name, cuisine, and address.  
+- Converted latitude and longitude into GeoJSON `location` objects for geospatial querying, and created a `2dsphere` index to support radius-based search.  
+- Stored a subset of restaurant images in MongoDB GridFS and linked them back to restaurant documents through `primary_image_gridfs_id`.  
+- Enabled MongoDB authentication by creating a scoped application user and updating the backend to connect using credentials.
+
+**Problems encountered and fixes**
+- The raw dataset contained inconsistent address formats, duplicate restaurant records, missing ratings, and invalid or swapped coordinates.  
+- Some image URLs were broken or unavailable, so image ingestion into GridFS had partial failures; we handled this by storing a valid subset and falling back gracefully when needed.  
+- We also ran into authentication-related issues after enabling MongoDB authorization; these were resolved by updating the backend connection string and using a dedicated MongoDB user with the required permissions.
 
 3) **Volume (collection sizes)**  
 
@@ -49,6 +56,14 @@ Sample queries that surface diverse results:
 - Clean UI (React/Vite), responsive layout, quick search bar + inline filters.  
 - API-first design: consistent JSON routes for frontend/other clients.
 
+5) **Bells and Whistles (what we’re proud of)**  
+- Combined **text search and geospatial search** using MongoDB’s 2dsphere indexing and flexible query design.  
+- Integrated **interactive map visualization** with live backend-driven results.  
+- Implemented **GridFS-based image storage** with graceful fallback to external image URLs when needed.  
+- Designed a flexible backend supporting **optional filters** such as min/max rating for extensibility.  
+- Built a clean **API-first architecture**, allowing a React frontend to fully consume backend services.  
+- Transitioned from a temporary server-rendered UI to a **modern React-based frontend**, improving scalability and separation of concerns.  
+- Deployed the application on a VM with working backend–frontend integration.
 ---
 
 ## Project Structure (high level)
