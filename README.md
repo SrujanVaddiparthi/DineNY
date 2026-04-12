@@ -1,6 +1,7 @@
 # DineNY
 
 DineNY is a MongoDB + FastAPI + React/Vite application for restaurant search in New York State. It supports text and geo search, rating filters, sorting, map visualization, detail pages, image serving from GridFS, and user comments.
+![alt DineNY_Search_Page](https://github.com/SrujanVaddiparthi/DineNY/blob/main/DineNY_search_page.png?raw=true)
 
 ---
 
